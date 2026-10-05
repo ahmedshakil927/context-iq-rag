@@ -4,7 +4,6 @@
 
 Context IQ is a retrieval-augmented generation (RAG) app that runs entirely on your own machine: no API keys, no data leaving your laptop. Upload PDFs, Word files, text or Markdown, then ask questions. It also ships with an **evaluation harness** that scores answer quality on a fixed test set, so every change to the pipeline is measured instead of guessed.
 
-<!-- TODO: add demo video link here, e.g. [Watch the 90-second demo](https://...) -->
 
 <p align="center">
   <img src="docs/images/chat.jpg" alt="Context IQ answering a question about a research paper, with cited source passages" width="820">
