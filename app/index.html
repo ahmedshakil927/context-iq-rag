@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Context IQ</title>
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2302b8cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M9 15h6'/%3E%3C/svg%3E">
+<style>
+/* ---- tokens (4px grid, one accent) ---- */
+:root{
+  --bg:#08090a; --panel:#0c0d0f; --surface:#191d20; --hover:#1c1c1f;
+  --border:#23252a; --border-2:#34343a;
+  --text:#e2e4e7; --text-2:#b4bcd0; --text-3:#8b93a1;
+  --accent:#02b8cc; --accent-ink:#04141a; --focus:#02b8cc;
+  --accent-tint:rgba(2,184,204,.14); --mark:rgba(2,184,204,.3);
+  --danger:#eb5757; --danger-tint:rgba(235,87,87,.14); --ok:#4cc38a;
+  --glow:rgba(2,184,204,.14);
+  --shadow:0 0 0 1px #00000066,0 4px 12px #00000040;
+  --r:8px; --r-lg:12px; --side:260px;
+  --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --spring:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01"}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;border:0;background:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+svg.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:8px;top:-48px;background:var(--accent);color:var(--accent-ink);padding:8px 12px;border-radius:var(--r);z-index:100}
+.skip:focus{top:8px}
+
+/* ---- shell ---- */
+.app{display:grid;grid-template-columns:var(--side) 1fr;height:100dvh}
+aside{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+.brand{display:flex;align-items:center;gap:8px;padding:16px 16px 12px}
+.mark{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,var(--focus),var(--accent));color:var(--accent-ink);display:grid;place-items:center;box-shadow:inset 0 1px #ffffff40}
+.mark .i{width:14px;height:14px}
+.brand b{font-weight:600;letter-spacing:-.01em}
+.side-actions{padding:0 12px 8px;display:grid;gap:8px}
+.side-body{padding:4px 12px 12px;overflow:auto;flex:1;min-height:0}
+.fine{margin:8px 4px 0;font-size:12px;line-height:1.45;color:var(--text-3)}
+.fine b{font-weight:500;color:var(--text-2)}
+.label{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:500;color:var(--text-3);margin:16px 4px 8px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:0 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:500;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:var(--hover);border-color:var(--border-2)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-ink);box-shadow:inset 0 1px #ffffff26}
+.btn.primary:hover{filter:brightness(1.1)}
+a.btn{text-decoration:none}
+.btn.quiet{justify-content:flex-start;background:none;border-color:transparent;color:var(--text-2)}
+.btn.quiet:hover{background:var(--hover);border-color:transparent;color:var(--text)}
+.pill{margin-left:auto;font:600 11px var(--mono);padding:2px 6px;border-radius:5px;background:var(--accent-tint);color:var(--focus)}
+.btn[disabled]{color:var(--text-3);background:var(--hover);border-color:transparent;cursor:not-allowed;box-shadow:none;transform:none;filter:none}
+.icon-btn{display:grid;place-items:center;min-width:36px;min-height:36px;border-radius:var(--r);color:var(--text-3);transition:background .15s,color .15s}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+@media (pointer:coarse){.icon-btn,.btn{min-height:44px;min-width:44px}}
+
+/* dropzone */
+.drop{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px dashed var(--border-2);border-radius:var(--r-lg);padding:12px;color:var(--text-2);transition:border-color .2s,background .2s,transform .25s var(--spring)}
+.drop .ic{width:32px;height:32px;border-radius:var(--r);background:var(--hover);display:grid;place-items:center;color:var(--text-2);flex:none;transition:background .2s,color .2s}
+.drop b{display:block;color:var(--text);font-weight:500;font-size:13px}
+.drop small{color:var(--text-3);font-size:12px}
+.drop:hover,.drop.over{border-color:var(--focus);background:var(--accent-tint)}
+.drop:hover .ic,.drop.over .ic{background:var(--accent);color:var(--accent-ink)}
+.drop.over{transform:scale(1.02)}
+
+/* docs */
+ul.docs{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.doc{display:flex;align-items:center;gap:8px;padding:6px 4px 6px 8px;border-radius:var(--r);animation:in .25s var(--spring);transition:background .15s}
+.doc:hover{background:var(--hover)}
+.badge{font:600 9.5px/1 var(--mono);letter-spacing:.02em;padding:4px 5px;border-radius:5px;background:var(--accent-tint);color:var(--focus);flex:none}
+.doc .meta{min-width:0;flex:1}
+.doc .name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.doc .sub{font-size:11.5px;color:var(--text-3)}
+.doc .icon-btn{opacity:0;transition:opacity .15s,background .15s,color .15s}
+.doc:hover .icon-btn,.doc:focus-within .icon-btn,.doc .icon-btn.confirm{opacity:1}
+@media (pointer:coarse){.doc .icon-btn{opacity:1}}
+.doc.err{background:var(--danger-tint)}
+.doc.err .sub{color:var(--danger)}
+.icon-btn.confirm{color:var(--danger);font-size:12px;font-weight:600;padding:0 8px;background:var(--danger-tint)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-2);border-top-color:var(--focus);animation:spin .7s linear infinite;flex:none;margin:0 3px}
+.empty-docs{color:var(--text-3);font-size:13px;padding:4px}
+.side-foot{padding:12px 16px;border-top:1px solid var(--border);color:var(--text-3);font-size:12px;display:flex;align-items:center;gap:8px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 22%,transparent)}
+.side-foot code{font-family:var(--mono);font-size:11.5px;color:var(--text-2)}
+
+/* top bar */
+header.top{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:48px;border-bottom:1px solid var(--border)}
+header.top h2{flex:1;margin:0;font-size:13px;font-weight:500;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.only-mobile{display:none}
+
+/* chat */
+#chat{flex:1;overflow:auto;padding:24px 16px 8px;scroll-behavior:smooth;background:radial-gradient(70% 40% at 50% 0,var(--glow),transparent 70%) no-repeat}
+.col{max-width:720px;margin:0 auto;display:grid;gap:24px}
+.welcome{text-align:center;padding:10vh 0 0}
+.welcome .mark{width:40px;height:40px;border-radius:10px;margin:0 auto 20px}
+.welcome .mark .i{width:22px;height:22px}
+.welcome h2{font-size:32px;line-height:1.2;font-weight:700;letter-spacing:-.025em;margin:0 0 8px;background:linear-gradient(180deg,var(--text) 40%,var(--text-3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.welcome p{color:var(--text-3);margin:0 auto;max-width:44ch;font-size:15px}
+.suggest{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:32px;text-align:left}
+.suggest button{display:flex;flex-direction:column;gap:8px;text-align:left;padding:12px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);color:var(--text-2);font-size:13px;line-height:1.4;min-height:84px;transition:border-color .15s,background .15s,transform .25s var(--spring)}
+.suggest button .i{color:var(--focus)}
+.suggest button:hover{border-color:var(--border-2);background:var(--hover);color:var(--text);transform:translateY(-2px)}
+
+.msg{animation:in .3s var(--spring)}
+.msg.user{justify-self:end;max-width:82%;background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:var(--r-lg) var(--r-lg) 4px var(--r-lg);white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.bot{display:grid;grid-template-columns:24px 1fr;gap:0 12px}
+.msg.bot .mark{margin-top:1px}
+.msg.bot .main{min-width:0}
+.msg.bot .body{overflow-wrap:anywhere;font-size:14.5px;line-height:1.65}
+.msg.bot .body p{margin:0 0 .75em}
+.msg.bot .body p:last-child{margin-bottom:0}
+.msg.bot .body ul,.msg.bot .body ol{margin:.2em 0 .75em;padding-left:1.3em}
+.msg.bot .body li{margin:.15em 0}
+.msg.bot .body code{font-family:var(--mono);font-size:.88em;background:var(--hover);border:1px solid var(--border);padding:1px 5px;border-radius:5px}
+.msg.bot.streaming .body::after{content:"";display:inline-block;width:2px;height:1.05em;margin-left:2px;vertical-align:text-bottom;background:var(--focus);animation:blink 1s steps(2) infinite}
+.msg.bot.refusal .body{color:var(--text-3)}
+.msg.bot.error .body{color:var(--danger)}
+.thinking{display:flex;gap:4px;padding:8px 0}
+.thinking i{width:6px;height:6px;border-radius:50%;background:var(--text-3);animation:pulse 1.2s ease-in-out infinite}
+.thinking i:nth-child(2){animation-delay:.15s}.thinking i:nth-child(3){animation-delay:.3s}
+.actions{display:flex;align-items:center;gap:4px;margin-top:8px;color:var(--text-3);font-size:12px}
+.actions .icon-btn{margin-left:-8px}
+.actions .icon-btn.ok{color:var(--ok)}
+.actions .meta{font-variant-numeric:tabular-nums}
+
+/* sources */
+details.sources{margin-top:12px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+details.sources>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:0 12px;min-height:40px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:background .15s}
+details.sources>summary:hover{background:var(--hover)}
+details.sources>summary::-webkit-details-marker{display:none}
+details.sources>summary .chev{margin-left:auto;transition:transform .25s var(--spring)}
+details.sources[open]>summary .chev{transform:rotate(180deg)}
+.src-list{border-top:1px solid var(--border);animation:in .25s var(--spring)}
+.src{border-bottom:1px solid var(--border)}
+.src:last-child{border-bottom:0}
+.src-btn{display:block;width:100%;text-align:left;padding:10px 12px;transition:background .15s}
+.src-btn:hover{background:var(--hover)}
+.src-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px}
+.src-head .n{min-width:18px;height:18px;border-radius:5px;background:var(--accent-tint);color:var(--focus);display:grid;place-items:center;font:600 10.5px var(--mono)}
+.src-head .where{font-weight:500;color:var(--text)}
+.src-head .pg{color:var(--text-3)}
+.score{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--text-3);font:11.5px var(--mono)}
+.score i{display:block;width:32px;height:3px;border-radius:2px;background:var(--border-2);overflow:hidden}
+.score i b{display:block;height:100%;background:var(--focus);border-radius:2px}
+.src-text{font-size:12.5px;color:var(--text-2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.src.open .src-text{-webkit-line-clamp:unset;display:block}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px}
+
+/* composer */
+.composer{padding:8px 16px 16px}
+.box{max-width:720px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+.box:focus-within{border-color:var(--focus);box-shadow:var(--shadow),0 0 0 3px var(--accent-tint)}
+textarea{display:block;width:100%;border:0;outline:0;background:none;resize:none;max-height:160px;padding:12px 14px 4px;line-height:1.5;font-size:15px}
+textarea:focus,textarea:focus-visible{outline:0;border-radius:0}
+textarea::placeholder{color:var(--text-3)}
+.row{display:flex;align-items:center;gap:8px;padding:4px 8px 8px 12px}
+.ctx{display:flex;align-items:center;gap:6px;color:var(--text-3);font-size:12px;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+kbd{font:500 10.5px var(--mono);border:1px solid var(--border-2);border-radius:5px;padding:1px 5px;color:var(--text-3);background:var(--panel)}
+.row .btn{min-width:36px;padding:0 10px}
+
+#toasts{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);display:grid;gap:8px;z-index:60;width:min(92vw,400px)}
+.toast{background:var(--text);color:var(--bg);padding:8px 12px;border-radius:var(--r);box-shadow:var(--shadow);font-size:13px;animation:in .25s var(--spring)}
+
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes pulse{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ---- responsive ---- */
+.scrim{display:none}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:min(86vw,320px);z-index:50;transform:translateX(-102%);transition:transform .3s var(--spring);box-shadow:var(--shadow)}
+  body.nav-open aside{transform:none}
+  body.nav-open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+  .only-mobile{display:grid}
+  .welcome{padding-top:4vh}
+  .welcome h2{font-size:26px}
+  .suggest{grid-template-columns:1fr}
+  .suggest button{min-height:0;flex-direction:row;align-items:center}
+  kbd{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#chat">Skip to chat</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M20 17v4H6.5a2.5 2.5 0 0 1 0-5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></symbol>
+  <symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></symbol>
+</svg>
+
+<div class="app">
+  <aside id="side" aria-label="Documents">
+    <div class="brand">
+      <div class="mark"><svg class="i"><use href="#i-book"/></svg></div>
+      <b>Context IQ</b>
+    </div>
+    <div class="side-actions">
+      <button class="btn" id="clear" type="button"><svg class="i"><use href="#i-plus"/></svg>New chat</button>
+      <a class="btn quiet" href="/quality" id="qlink"><svg class="i"><use href="#i-chart"/></svg>Quality<span class="pill" id="qpill" hidden></span></a>
+    </div>
+    <div class="side-body">
+      <input type="file" id="file" class="sr" multiple accept=".pdf,.docx,.txt,.md" tabindex="-1">
+      <button class="drop" id="drop" type="button">
+        <span class="ic"><svg class="i"><use href="#i-upload"/></svg></span>
+        <span><b>Add documents</b><small>Drop files or click to browse</small></span>
+      </button>
+      <p class="fine"><b>Supported:</b> PDF, Word (.docx), TXT, Markdown. Scanned PDFs, .doc, PowerPoint and Excel aren't supported yet.</p>
+      <div class="label"><span>Documents <span id="count"></span></span></div>
+      <ul class="docs" id="docs" aria-live="polite"></ul>
+      <div class="empty-docs" id="no-docs">Nothing uploaded yet.</div>
+    </div>
+    <div class="side-foot" id="foot"><span class="dot"></span><span>Runs locally</span></div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main>
+    <header class="top">
+      <button class="icon-btn only-mobile" id="menu" aria-label="Open documents"><svg class="i"><use href="#i-menu"/></svg></button>
+      <h2 id="title">New chat</h2>
+    </header>
+
+    <div id="chat" role="log" aria-live="polite" tabindex="-1">
+      <div class="col" id="col">
+        <section class="welcome" id="welcome">
+          <div class="mark"><svg class="i"><use href="#i-book"/></svg></div>
+          <h2>Ask your documents anything</h2>
+          <p id="welcome-sub">Add a file on the left. Answers come only from your documents, with the exact passages cited.</p>
+          <div class="suggest" id="suggest" hidden>
+            <button type="button"><svg class="i"><use href="#i-list"/></svg>Summarise the main points</button>
+            <button type="button"><svg class="i"><use href="#i-key"/></svg>What are the key terms or definitions?</button>
+            <button type="button"><svg class="i"><use href="#i-hash"/></svg>What numbers or results are mentioned?</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="composer">
+      <form class="box" id="form" autocomplete="off">
+        <label for="q" class="sr">Your question</label>
+        <textarea id="q" rows="1" placeholder="Add a document to start" disabled></textarea>
+        <div class="row">
+          <span class="ctx" id="ctx">No documents</span>
+          <kbd>↵</kbd>
+          <button class="btn primary" id="send" type="submit" disabled aria-label="Send question"><svg class="i"><use href="#i-send"/></svg></button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const icon = n => `<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
+
+let docs = [], busy = false, controller = null, cfg = null;
+
+function toast(msg){
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+  $("#toasts").append(t); setTimeout(() => t.remove(), 4500);
+}
+
+/* mobile drawer */
+const nav = open => document.body.classList.toggle("nav-open", open);
+$("#menu").onclick = () => nav(true);
+$("#scrim").onclick = () => nav(false);
+
+/* ---------- documents ---------- */
+const ext = n => (n.split(".").pop() || "").slice(0, 4).toUpperCase();
+async function loadDocs(){
+  try { docs = await (await fetch("/documents")).json(); } catch { docs = []; }
+  renderDocs();
+}
+function renderDocs(){
+  const ul = $("#docs");
+  ul.querySelectorAll(".doc:not(.pending):not(.err)").forEach(n => n.remove());
+  docs.forEach(d => ul.append(docItem(d)));
+  const n = docs.length;
+  $("#no-docs").hidden = n > 0 || ul.children.length > 0;
+  $("#count").textContent = n ? n : "";
+  $("#title").textContent = n ? (n === 1 ? docs[0].name : `${n} documents`) : "New chat";
+  $("#q").disabled = n === 0;
+  $("#q").placeholder = n ? "Ask a question about your documents…" : "Add a document to start";
+  $("#send").disabled = busy ? false : (n === 0 || !$("#q").value.trim());
+  $("#suggest").hidden = n === 0;
+  const chunks = docs.reduce((a, d) => a + d.chunks, 0);
+  $("#ctx").textContent = n ? `${n} document${n === 1 ? "" : "s"} · ${chunks} chunks${cfg ? " · " + cfg.search + " search" : ""}` : "No documents";
+  $("#welcome-sub").textContent = n
+    ? "Answers come only from your documents, with the exact passages cited."
+    : "Add a file on the left. Answers come only from your documents, with the exact passages cited.";
+}
+function docItem(d){
+  const li = document.createElement("li"); li.className = "doc";
+  li.innerHTML = `<span class="badge">${esc(ext(d.name))}</span>
+    <div class="meta"><div class="name" title="${esc(d.name)}">${esc(d.name)}</div>
+    <div class="sub">${d.pages} page${d.pages === 1 ? "" : "s"} · ${d.chunks} chunks</div></div>
+    <button class="icon-btn" aria-label="Remove ${esc(d.name)}">${icon("trash")}</button>`;
+  const btn = li.querySelector("button"); let timer;
+  btn.onclick = async () => {
+    if (!btn.classList.contains("confirm")) {
+      btn.classList.add("confirm"); btn.textContent = "Remove?";
+      timer = setTimeout(() => { btn.classList.remove("confirm"); btn.innerHTML = icon("trash"); }, 3000);
+      return;
+    }
+    clearTimeout(timer);
+    const r = await fetch("/documents/" + encodeURIComponent(d.name), {method: "DELETE"});
+    if (!r.ok) toast("Couldn't remove " + d.name);
+    loadDocs();
+  };
+  return li;
+}
+async function uploadFiles(files){
+  for (const f of files) {
+    const li = document.createElement("li"); li.className = "doc pending";
+    li.innerHTML = `<div class="spin" role="status" aria-label="Indexing"></div>
+      <div class="meta"><div class="name">${esc(f.name)}</div><div class="sub">Reading and indexing…</div></div>`;
+    $("#docs").prepend(li); $("#no-docs").hidden = true;
+    const fd = new FormData(); fd.append("file", f);
+    try {
+      const r = await fetch("/upload", {method: "POST", body: fd});
+      if (!r.ok) {
+        let msg = await r.text(); try { msg = JSON.parse(msg).detail } catch {}
+        throw new Error(msg);
+      }
+      li.remove();
+    } catch (e) {
+      li.className = "doc err";
+      li.innerHTML = `<span class="badge" style="background:var(--danger-tint);color:var(--danger)">${esc(ext(f.name))}</span>
+        <div class="meta"><div class="name">${esc(f.name)}</div><div class="sub">${esc(String(e.message || e)).slice(0, 140)}</div></div>
+        <button class="icon-btn" aria-label="Dismiss" style="opacity:1">${icon("check")}</button>`;
+      li.querySelector("button").onclick = () => { li.remove(); renderDocs(); };
+    }
+    await loadDocs();
+  }
+}
+const drop = $("#drop"), fileInput = $("#file");
+drop.onclick = () => fileInput.click();
+fileInput.onchange = () => { uploadFiles([...fileInput.files]); fileInput.value = ""; };
+["dragenter", "dragover"].forEach(ev => addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => addEventListener(ev, e => { e.preventDefault(); if (ev === "drop" || e.target === document.documentElement) drop.classList.remove("over"); }));
+addEventListener("drop", e => { if (e.dataTransfer?.files.length) { uploadFiles([...e.dataTransfer.files]); nav(false); } });
+
+/* ---------- chat ---------- */
+const chat = $("#chat"), col = $("#col");
+const atBottom = () => chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
+const toBottom = () => { chat.scrollTop = chat.scrollHeight; };
+
+function md(text){
+  const blocks = esc(text).split(/\n{2,}/).map(b => {
+    const lines = b.split("\n");
+    if (lines.every(l => /^\s*[-*•]\s+/.test(l))) return "<ul>" + lines.map(l => `<li>${l.replace(/^\s*[-*•]\s+/, "")}</li>`).join("") + "</ul>";
+    if (lines.every(l => /^\s*\d+[.)]\s+/.test(l))) return "<ol>" + lines.map(l => `<li>${l.replace(/^\s*\d+[.)]\s+/, "")}</li>`).join("") + "</ol>";
+    return "<p>" + b.replace(/\n/g, "<br>") + "</p>";
+  });
+  return blocks.join("").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>");
+}
+const STOP = new Set("the a an of in on to for and or is are was were be what which who how why does do did with from that this these those it its by as at about into than then".split(" "));
+function highlight(text, q){
+  const words = [...new Set((q.toLowerCase().match(/[a-z0-9][a-z0-9\-]{2,}/g) || []).filter(w => !STOP.has(w)))];
+  let out = esc(text);
+  if (words.length) out = out.replace(new RegExp("\\b(" + words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "gi"), "<mark>$1</mark>");
+  return out;
+}
+function sourcesEl(sources, q){
+  const det = document.createElement("details"); det.className = "sources";
+  det.innerHTML = `<summary>${icon("file")} ${sources.length} source${sources.length === 1 ? "" : "s"}<span class="chev">${icon("chev")}</span></summary><div class="src-list"></div>`;
+  const list = det.querySelector(".src-list");
+  sources.forEach((s, i) => {
+    const el = document.createElement("div"); el.className = "src";
+    const pct = Math.max(0, Math.min(100, Math.round(s.score * 100)));
+    el.innerHTML = `<button class="src-btn" type="button" aria-expanded="false">
+      <div class="src-head"><span class="n">${i + 1}</span><span class="where">${esc(s.doc)}</span><span class="pg">p. ${s.page}</span>
+      <span class="score" title="Semantic similarity"><i><b style="width:${pct}%"></b></i>${s.score.toFixed(2)}</span></div>
+      <div class="src-text">${highlight(s.text, q)}</div></button>`;
+    const b = el.querySelector("button");
+    b.onclick = () => b.setAttribute("aria-expanded", el.classList.toggle("open"));
+    list.append(el);
+  });
+  return det;
+}
+function addUser(text){
+  const d = document.createElement("div"); d.className = "msg user"; d.textContent = text; col.append(d); toBottom();
+}
+function addBot(){
+  const d = document.createElement("div"); d.className = "msg bot streaming";
+  d.innerHTML = `<div class="mark" aria-hidden="true">${icon("book")}</div>
+    <div class="main"><div class="body"><div class="thinking" aria-label="Thinking"><i></i><i></i><i></i></div></div></div>`;
+  col.append(d); toBottom(); return d;
+}
+function finishBot(d, text, secs, nSources){
+  d.classList.remove("streaming");
+  const acts = document.createElement("div"); acts.className = "actions";
+  acts.innerHTML = `<button class="icon-btn" aria-label="Copy answer">${icon("copy")}</button>
+    <span class="meta">${secs.toFixed(1)}s${nSources ? " · " + nSources + " sources" : ""}</span>`;
+  const b = acts.querySelector("button");
+  b.onclick = async () => { try { await navigator.clipboard.writeText(text); b.classList.add("ok"); b.innerHTML = icon("check"); setTimeout(() => { b.classList.remove("ok"); b.innerHTML = icon("copy"); }, 1500); } catch { toast("Copy failed"); } };
+  const main = d.querySelector(".main");
+  main.insertBefore(acts, main.querySelector("details.sources"));
+}
+function setBusy(v){
+  busy = v;
+  const s = $("#send");
+  s.innerHTML = icon(v ? "stop" : "send");
+  s.setAttribute("aria-label", v ? "Stop generating" : "Send question");
+  s.disabled = !v && (docs.length === 0 || !$("#q").value.trim());
+}
+
+async function ask(question){
+  $("#welcome").hidden = true;
+  addUser(question);
+  const bot = addBot(), body = bot.querySelector(".body"), main = bot.querySelector(".main");
+  setBusy(true); controller = new AbortController();
+  const t0 = performance.now();
+  let text = "", sources = [], started = false;
+  try {
+    const res = await fetch("/ask/stream", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({question}), signal: controller.signal});
+    if (!res.ok) throw new Error(await res.text());
+    const reader = res.body.getReader(), dec = new TextDecoder(); let buf = "";
+    for (;;) {
+      const {value, done} = await reader.read(); if (done) break;
+      buf += dec.decode(value, {stream: true});
+      let nl;
+      while ((nl = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1); if (!line) continue;
+        const ev = JSON.parse(line);
+        if (ev.type === "sources") sources = ev.sources;
+        else if (ev.type === "token") { started = true; text += ev.text; const stick = atBottom(); body.innerHTML = md(text); if (stick) toBottom(); }
+        else if (ev.type === "error") throw new Error(ev.message);
+      }
+    }
+    if (!started) body.innerHTML = md("No answer was returned.");
+    if (!sources.length) bot.classList.add("refusal"); else main.append(sourcesEl(sources, question));
+    finishBot(bot, text, (performance.now() - t0) / 1000, sources.length);
+  } catch (e) {
+    if (e.name === "AbortError") {
+      if (!started) body.innerHTML = "<p><i>Stopped.</i></p>";
+      if (sources.length) main.append(sourcesEl(sources, question));
+      if (started) finishBot(bot, text, (performance.now() - t0) / 1000, sources.length); else bot.classList.remove("streaming");
+    } else {
+      bot.classList.remove("streaming"); bot.classList.add("error");
+      body.innerHTML = `<p>Something went wrong: ${esc(String(e.message || e).slice(0, 200))}</p><p style="color:var(--text-3);font-size:13px">Is Ollama running? Try <code>ollama serve</code>.</p>`;
+    }
+  } finally {
+    controller = null; setBusy(false); renderDocs();
+    if (matchMedia("(pointer:fine)").matches) $("#q").focus();
+  }
+}
+
+/* composer */
+const q = $("#q");
+const grow = () => { q.style.height = "auto"; q.style.height = Math.min(q.scrollHeight, 160) + "px"; };
+q.addEventListener("input", () => { grow(); if (!busy) $("#send").disabled = !q.value.trim() || !docs.length; });
+q.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("#form").requestSubmit(); } });
+$("#form").addEventListener("submit", e => {
+  e.preventDefault();
+  if (busy) { controller?.abort(); return; }
+  const v = q.value.trim(); if (!v || !docs.length) return;
+  q.value = ""; grow(); ask(v);
+});
+$("#suggest").addEventListener("click", e => { const b = e.target.closest("button"); if (b && !busy) ask(b.textContent.trim()); });
+$("#clear").onclick = () => {
+  if (busy) controller?.abort();
+  col.querySelectorAll(".msg").forEach(m => m.remove()); $("#welcome").hidden = false; nav(false); q.focus();
+};
+/* shortcuts: "/" focuses the composer, Esc stops generating / closes drawer */
+addEventListener("keydown", e => {
+  if (e.key === "Escape") { nav(false); if (busy) controller?.abort(); }
+  else if (e.key === "/" && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName) && !q.disabled) { e.preventDefault(); q.focus(); }
+});
+
+fetch("/config").then(r => r.json()).then(c => {
+  cfg = c;
+  $("#foot").innerHTML = `<span class="dot"></span><span>${c.provider === "groq" ? "Groq" : "Local"} · <code>${esc(c.model)}</code></span>`;
+  renderDocs();
+}).catch(() => {});
+
+fetch("/eval/results").then(r => r.json()).then(d => {
+  const run = d.results.find(r => r.label === d.running);
+  if (!run) return;  // no eval row for the setup that's running, so show nothing rather than a wrong number
+  const p = $("#qpill"); p.textContent = Math.round(run.answer_correct * 100) + "%"; p.hidden = false;
+  p.title = "Answer accuracy of the setup running now";
+}).catch(() => {});
+
+loadDocs();
+</script>
+</body>
+</html>

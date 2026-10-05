@@ -1,0 +1,270 @@
+[
+ {
+  "doc": "attention",
+  "q": "How many parallel attention heads does the base Transformer use?",
+  "expect": [
+   "h = 8",
+   "8 parallel",
+   "eight"
+  ],
+  "answer_expect": [
+   "8",
+   "eight"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What BLEU score did the big Transformer achieve on WMT 2014 English-to-German translation?",
+  "expect": [
+   "28.4"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What optimizer was used to train the Transformer?",
+  "expect": [
+   "Adam"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What is the model dimension d_model in the base Transformer?",
+  "expect": [
+   "512"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "How many layers are in the Transformer encoder stack?",
+  "expect": [
+   "N = 6",
+   "6 identical",
+   "stack of 6"
+  ],
+  "answer_expect": [
+   "6",
+   "six"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What dimensionality does the feed-forward network inner layer have?",
+  "expect": [
+   "2048"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What functions are used for the positional encodings?",
+  "expect": [
+   "sine",
+   "cosine"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What hardware was the Transformer trained on?",
+  "expect": [
+   "P100"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "What dropout rate did the base model use?",
+  "expect": [
+   "0.1"
+  ]
+ },
+ {
+  "doc": "attention",
+  "q": "Why is dot-product attention scaled by the square root of d_k?",
+  "expect": [
+   "small gradients",
+   "extremely small",
+   "large magnitude",
+   "large in magnitude"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "What are the two RAG model formulations proposed in the paper?",
+  "expect": [
+   "RAG-Sequence",
+   "RAG-Token"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "Which retriever does RAG use?",
+  "expect": [
+   "DPR",
+   "Dense Passage Retriever"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "Which pre-trained sequence-to-sequence model is the RAG generator?",
+  "expect": [
+   "BART"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "Which knowledge source is used as the non-parametric memory?",
+  "expect": [
+   "Wikipedia"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "What library is used for fast maximum inner product search?",
+  "expect": [
+   "FAISS"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "Which open-domain question answering datasets was RAG evaluated on?",
+  "expect": [
+   "Natural Questions",
+   "TriviaQA"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "How long are the Wikipedia passages that were indexed?",
+  "expect": [
+   "100 word",
+   "100-word"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "How is the DPR retriever architected?",
+  "expect": [
+   "bi-encoder",
+   "BERT"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "Can RAG's knowledge be updated without retraining?",
+  "expect": [
+   "hot-swap",
+   "replac",
+   "swap",
+   "updat"
+  ]
+ },
+ {
+  "doc": "rag",
+  "q": "What does the parametric memory in RAG consist of?",
+  "expect": [
+   "BART",
+   "seq2seq",
+   "pre-trained"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "What are the two pre-training tasks used by BERT?",
+  "expect": [
+   "Masked",
+   "Next Sentence"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "How many parameters does BERT-BASE have?",
+  "expect": [
+   "110M"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "How many parameters does BERT-LARGE have?",
+  "expect": [
+   "340M"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "What percentage of tokens are masked in the masked language model?",
+  "expect": [
+   "15%"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "Which corpora was BERT pre-trained on?",
+  "expect": [
+   "BooksCorpus",
+   "Wikipedia"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "What is the hidden size of BERT-BASE?",
+  "expect": [
+   "768"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "How many Transformer layers does BERT-LARGE have?",
+  "expect": [
+   "24"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "What is the GLUE score of BERT-LARGE?",
+  "expect": [
+   "80.5"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "What special token is used for classification tasks at the start of every sequence?",
+  "expect": [
+   "[CLS]"
+  ]
+ },
+ {
+  "doc": "bert",
+  "q": "How many attention heads does BERT-BASE have?",
+  "expect": [
+   "12"
+  ]
+ },
+ {
+  "doc": null,
+  "q": "What is the capital of France?",
+  "expect": null
+ },
+ {
+  "doc": null,
+  "q": "How much money did it cost in dollars to train these models?",
+  "expect": null
+ },
+ {
+  "doc": null,
+  "q": "What is the parameter count of GPT-4?",
+  "expect": null
+ },
+ {
+  "doc": null,
+  "q": "Who won the 2018 FIFA World Cup?",
+  "expect": null
+ },
+ {
+  "doc": null,
+  "q": "What is the recommended recipe for sourdough bread?",
+  "expect": null
+ },
+ {
+  "doc": null,
+  "q": "What is the current stock price of Google?",
+  "expect": null
+ }
+]
