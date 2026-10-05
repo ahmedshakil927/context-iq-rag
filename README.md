@@ -136,3 +136,7 @@ scripts/         fetch_eval_docs.sh
 ## Tech stack
 
 Python · FastAPI · NumPy · pypdf · python-docx · Ollama (Llama 3.1 8B, nomic-embed-text) · vanilla HTML/CSS/JS · pytest
+
+## License
+
+MIT. See [LICENSE](LICENSE).

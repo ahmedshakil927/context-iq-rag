@@ -5,3 +5,5 @@ __pycache__/
 eval/embed_cache.json
 docs/*.pdf
 eval/archive/
+resume/
+.DS_Store
