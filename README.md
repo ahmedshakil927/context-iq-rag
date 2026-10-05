@@ -72,7 +72,7 @@ flowchart LR
 
 ## Quick start
 
-Requires Python 3.10+ (developed and tested on 3.14) and [Ollama](https://ollama.com).
+Requires Python 3.10+ (developed and tested on 3.14) and [Ollama](https://ollama.com). Tested on macOS. On Windows, activate the environment with `.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate`.
 
 ```bash
 ollama pull nomic-embed-text
