@@ -84,7 +84,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --port 8000
 ```
 
-Open <http://127.0.0.1:8000>, add a document, and ask a question. The 8B model needs roughly 6 GB of free memory; to use the lighter 3B model (same score on the eval) set `LLM_MODEL = "llama3.2:3b"` in [`app/config.py`](app/config.py).
+Then open `http://127.0.0.1:8000` in your browser (that address means "this computer", so it only works on your own machine while the app is running; there is no hosted demo), add a document, and ask a question. The 8B model needs roughly 6 GB of free memory; to use the lighter 3B model (same score on the eval) set `LLM_MODEL = "llama3.2:3b"` in [`app/config.py`](app/config.py).
 
 ## Run the tests and the eval
 
